@@ -6,4 +6,4 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: svgpanel tests
-      run: cd src && python3 unittest.py all
+      run: cd src && ./runtests
