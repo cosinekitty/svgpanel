@@ -1,0 +1,9 @@
+name: svgpanel unit tests
+on: [push]
+jobs:
+  SvgPanelTests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: svgpanel tests
+      run: cd src && python3 unittest.py all

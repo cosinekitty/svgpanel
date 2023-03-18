@@ -1,0 +1,12 @@
+#!/bin/bash
+
+echo "Type-checking svgpanel.py"
+mypy --strict --module svgpanel || exit 1
+
+echo "Type-checking unittest.py"
+mypy --strict unittest.py || exit 1
+
+./unittest.py all || exit 1
+
+cat pass.txt
+exit 0
