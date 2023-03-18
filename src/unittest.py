@@ -12,12 +12,22 @@ def Debug(message: str) -> None:
     if Verbose:
         Info(message)
 
-def Nothing() -> int:
+def Fail(message: str) -> int:
+    Info('FAIL: {}'.format(message))
+    return 1
+
+
+def EmptyPanel() -> int:
+    p = Panel(3)
+    if p.mmWidth != 15.24:
+        return Fail('Incorrect panel width = {} mm.'.format(p.mmWidth))
     return 0
 
+
 UnitTests: Dict[str, Callable[[], int]] = {
-    'nothing' : Nothing
+    'empty_panel' : EmptyPanel,
 }
+
 
 def RunTest(args: List[str]) -> int:
     if len(args) > 0:
