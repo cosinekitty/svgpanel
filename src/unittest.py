@@ -27,8 +27,16 @@ def EmptyPanel() -> int:
     return 0
 
 
+def FontTest() -> int:
+    f = Font('../fonts/QuicksandLight_10pt_250um.svg')
+    pathList = f.render('quick brown fox')
+    print(pathList.svg(0.0, 0.0))
+    return 0
+
+
 UnitTests: Dict[str, Callable[[], int]] = {
     'empty_panel' : EmptyPanel,
+    'font': FontTest,
 }
 
 

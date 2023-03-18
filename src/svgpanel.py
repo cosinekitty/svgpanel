@@ -2,10 +2,30 @@
 """Classes for generating VCV Rack panel designs.
 """
 
+import xml.etree.ElementTree as et
+
+
 class Error(Exception):
     """Indicates an error in an svgpanel function."""
     def __init__(self, message: str) -> None:
         Exception.__init__(self, message)
+
+
+class PathList:
+    def __init__(self) -> None:
+        pass
+
+    def svg(self, xmm: float, ymm: float) -> str:
+        return ''
+
+
+class Font:
+    def __init__(self, filename: str) -> None:
+        self.filename = filename
+        self.xml = et.parse(filename)
+
+    def render(self, text: str) -> PathList:
+        return PathList()
 
 
 class Panel:
