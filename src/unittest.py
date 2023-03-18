@@ -21,6 +21,9 @@ def EmptyPanel() -> int:
     p = Panel(3)
     if p.mmWidth != 15.24:
         return Fail('Incorrect panel width = {} mm.'.format(p.mmWidth))
+    text = p.svg()
+    with open('output/empty.svg', 'wt') as outfile:
+        outfile.write(text)
     return 0
 
 
