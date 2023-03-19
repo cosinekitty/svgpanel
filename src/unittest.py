@@ -30,7 +30,7 @@ def EmptyPanel() -> int:
 def FontTest() -> int:
     p = Panel(12)
     f = Font('../fonts/Quicksand-Light.ttf')
-    pathText = f.render('quick brown fox', 10.0, 40.0, 0.05, 0.05)
+    pathText = f.render('quick brown fox', 3.0, 10.0, 0.005, 0.005)
     p.addPath(pathText)
     text = p.svg()
     with open('output/font01.svg', 'wt') as outfile:

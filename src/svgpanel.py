@@ -23,16 +23,20 @@ class Font:
         self.glyphs = self.ttfont.getGlyphSet()
 
     def render(self, text: str, xpos: float, ypos: float, xscale: float, yscale: float) -> str:
+        x = xpos
+        y = ypos
         spen = SVGPathPen(self.glyphs)
-        tran = DecomposedTransform(translateX = xpos, translateY = ypos, scaleX = xscale, scaleY = -yscale).toTransform()
-        pen = TransformPen(spen, tran)
+        space = self.glyphs['r']
+        xshift = 0.96 * xscale
         for ch in text:
+            tran = DecomposedTransform(translateX = x, translateY = y, scaleX = xscale, scaleY = -yscale).toTransform()
+            pen = TransformPen(spen, tran)
             glyph = self.glyphs.get(ch)
             if glyph:
-                self.glyphs[ch].draw(pen)
+                glyph.draw(pen)
+                x += glyph.width * xshift
             else:
-                # FIXFIXFIX: treat as a space character
-                pass
+                x += space.width * xshift
         return str(spen.getCommands())
 
 
