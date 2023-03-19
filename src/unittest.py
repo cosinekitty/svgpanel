@@ -63,6 +63,7 @@ def RunTest(args: List[str]) -> int:
             return 1
         if checkfunc() == 0:
             Info('PASS: {}'.format(name))
+            return 0
         else:
             Info('FAIL: {}'.format(name))
             return 1
