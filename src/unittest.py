@@ -28,13 +28,14 @@ def EmptyPanel() -> int:
 
 
 def FontTest() -> int:
-    p = Panel(12)
-    f = Font('../fonts/Quicksand-Light.ttf')
-    p.addPath(f.render('quick brown fox', 3.0, 10.0, 10.0))
-    p.addPath(f.render('STIF CURL MASS',  3.0, 20.0, 10.0))
-    text = p.svg()
+    panel = Panel(12)
+    group = Element('g').setAttrib('style', 'stroke:#000000;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:bevel')
+    font = Font('../fonts/Quicksand-Light.ttf')
+    group.append(TextPath('quick brown fox', 3.0, 10.0, font, 10.0))
+    group.append(TextPath('STIF CURL MASS',  3.0, 20.0, font, 10.0))
+    panel.append(group)
     with open('output/font01.svg', 'wt') as outfile:
-        outfile.write(text)
+        outfile.write(panel.svg())
     return 0
 
 
