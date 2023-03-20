@@ -30,10 +30,9 @@ class Font:
         y = ypos
         spen = SVGPathPen(self.glyphs)
         for ch in text:
-            tran = DecomposedTransform(translateX = x, translateY = y, scaleX = mmPerUnit, scaleY = -mmPerUnit).toTransform()
-            pen = TransformPen(spen, tran)
-            glyph = self.glyphs.get(ch)
-            if glyph:
+            if glyph := self.glyphs.get(ch):
+                tran = DecomposedTransform(translateX = x, translateY = y, scaleX = mmPerUnit, scaleY = -mmPerUnit).toTransform()
+                pen = TransformPen(spen, tran)
                 glyph.draw(pen)
                 x += mmPerUnit * glyph.width
             else:

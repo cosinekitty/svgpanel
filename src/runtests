@@ -9,7 +9,7 @@ mypy --strict unittest.py || exit 1
 rm -f output/*.svg
 ./unittest.py all || exit 1
 
-for name in empty; do
+for name in empty font01; do
     echo "runtests: checking ${name}.svg"
     if ! diff {correct,output}/${name}.svg; then
         echo "FAIL(runtests): incorrect output for ${name}.svg"
