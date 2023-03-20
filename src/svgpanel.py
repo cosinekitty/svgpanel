@@ -22,21 +22,23 @@ class Font:
         self.ttfont = TTFont(filename)
         self.glyphs = self.ttfont.getGlyphSet()
 
-    def render(self, text: str, xpos: float, ypos: float, xscale: float, yscale: float) -> str:
+    def render(self, text: str, xpos: float, ypos: float, points: float) -> str:
+        # Calculate how many millimeters there are per font unit in this point size.
+        mmPerEm = (25.4 / 72)*points
+        mmPerUnit = mmPerEm / self.ttfont['head'].unitsPerEm
         x = xpos
         y = ypos
         spen = SVGPathPen(self.glyphs)
-        space = self.glyphs['r']
-        xshift = 0.96 * xscale
         for ch in text:
-            tran = DecomposedTransform(translateX = x, translateY = y, scaleX = xscale, scaleY = -yscale).toTransform()
+            tran = DecomposedTransform(translateX = x, translateY = y, scaleX = mmPerUnit, scaleY = -mmPerUnit).toTransform()
             pen = TransformPen(spen, tran)
             glyph = self.glyphs.get(ch)
             if glyph:
                 glyph.draw(pen)
-                x += glyph.width * xshift
+                x += mmPerUnit * glyph.width
             else:
-                x += space.width * xshift
+                # Use a "3-em space", which confusingly is one-third of an em wide.
+                x += mmPerEm / 3
         return str(spen.getCommands())
 
 
@@ -55,8 +57,11 @@ class Panel:
         '''Generate the SVG for the panel design.'''
         text = '<?xml version="1.0" encoding="utf-8"?>\n'
         text += '<svg xmlns="http://www.w3.org/2000/svg" width="{0:0.2f}mm" height="{1:0.2f}mm" viewBox="0 0 {0:0.2f} {1:0.2f}">\n'.format(self.mmWidth, self.mmHeight)
-        for pt in self.pathlist:
-            text += '<path d="{}"/>\n'.format(pt)
+        if len(self.pathlist) > 0:
+            text += '<g style="stroke:#000000;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:bevel">\n'
+            for pt in self.pathlist:
+                text += '<path d="{}"/>\n'.format(pt)
+            text += '</g>\n'
         text += '</svg>\n'
         return text
 
