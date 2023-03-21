@@ -22,6 +22,13 @@ class Font:
         self.ttfont = TTFont(filename)
         self.glyphs = self.ttfont.getGlyphSet()
 
+    def __enter__(self) -> 'Font':
+        self.ttfont.__enter__()
+        return self
+
+    def __exit__(self, exc_type:Any, exc_val:Any, exc_tb:Any) -> Any:
+        return self.ttfont.__exit__(exc_type, exc_val, exc_tb)
+
     def render(self, text:str, xpos:float, ypos:float, points:float) -> str:
         # Calculate how many millimeters there are per font unit in this point size.
         mmPerEm = (25.4 / 72)*points
