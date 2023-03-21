@@ -48,6 +48,16 @@ class Font:
         return str(spen.getCommands())
 
 
+class TextItem:
+    def __init__(self, text:str, font:Font, points:float):
+        self.text = text
+        self.font = font
+        self.points = points
+
+    def render(self, x:float, y:float) -> str:
+        return self.font.render(self.text, x, y, self.points)
+
+
 class Element:
     def __init__(self, tag:str, id:str = '') -> None:
         self.tag = tag
@@ -79,9 +89,9 @@ class Element:
 
 
 class TextPath(Element):
-    def __init__(self, text:str, x:float, y:float, font:Font, points:float, id:str = '') -> None:
+    def __init__(self, textItem:TextItem, x:float, y:float, id:str = '') -> None:
         super().__init__('path', id)
-        self.setAttrib('d', font.render(text, x, y, points))
+        self.setAttrib('d', textItem.render(x, y))
 
 
 class Panel(Element):
