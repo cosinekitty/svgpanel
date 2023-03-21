@@ -27,14 +27,31 @@ def EmptyPanel() -> int:
     return 0
 
 
+def TextBoundingBox(t:TextItem, x:float, y:float) -> Element:
+    (w, h) = t.measure()
+    rect = Element('rect')
+    rect.setAttribFloat('x', x)
+    rect.setAttribFloat('y', y)
+    rect.setAttribFloat('width', w)
+    rect.setAttribFloat('height', h)
+    rect.setAttrib('style', 'fill:none;stroke:blue;stroke-width:0.1')
+    return rect
+
 def FontTest() -> int:
     panel = Panel(12)
     group = Element('g').setAttrib('style', 'stroke:#000000;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:bevel')
     with Font('../fonts/Quicksand-Light.ttf') as font:
+
         t1 = TextItem('quick brown fox', font, 10.0)
+        (x1, y1) = (3.0, 10.0)
+        group.append(TextPath(t1, x1, y1))
+        group.append(TextBoundingBox(t1, x1, y1))
+
         t2 = TextItem('STIF CURL MASS', font, 10.0)
-        group.append(TextPath(t1, 3.0, 10.0))
-        group.append(TextPath(t2, 3.0, 20.0))
+        (x2, y2) = (3.0, 20.0)
+        group.append(TextPath(t2, x2, y2))
+        group.append(TextBoundingBox(t2, x2, y2))
+
     panel.append(group)
     with open('output/font01.svg', 'wt') as outfile:
         outfile.write(panel.svg())

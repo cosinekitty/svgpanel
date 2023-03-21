@@ -34,7 +34,7 @@ class Font:
         mmPerEm = (25.4 / 72)*points
         mmPerUnit = mmPerEm / self.ttfont['head'].unitsPerEm
         x = xpos
-        y = ypos
+        y = ypos + mmPerUnit * (self.ttfont['head'].yMax + self.ttfont['head'].yMin/2)
         spen = SVGPathPen(self.glyphs)
         for ch in text:
             if glyph := self.glyphs.get(ch):
@@ -47,6 +47,19 @@ class Font:
                 x += mmPerEm / 3
         return str(spen.getCommands())
 
+    def measure(self, text:str, points:float) -> Tuple[float,float]:
+        mmPerEm = (25.4 / 72)*points
+        mmPerUnit = mmPerEm / self.ttfont['head'].unitsPerEm
+        x = 0.0
+        y = mmPerUnit * (self.ttfont['head'].yMax - self.ttfont['head'].yMin)
+        for ch in text:
+            if glyph := self.glyphs.get(ch):
+                x += mmPerUnit * glyph.width
+            else:
+                # Use a "3-em space", which confusingly is one-third of an em wide.
+                x += mmPerEm / 3
+        return (x, y)
+
 
 class TextItem:
     def __init__(self, text:str, font:Font, points:float):
@@ -56,6 +69,9 @@ class TextItem:
 
     def render(self, x:float, y:float) -> str:
         return self.font.render(self.text, x, y, self.points)
+
+    def measure(self) -> Tuple[float,float]:
+        return self.font.measure(self.text, self.points)
 
 
 class Element:
@@ -69,6 +85,9 @@ class Element:
         if value:
             self.attrib[key] = value
         return self
+
+    def setAttribFloat(self, key:str, value:float) -> 'Element':
+        return self.setAttrib(key, '{:0.3g}'.format(value))
 
     def append(self, elem:'Element') -> 'Element':
         self.children.append(elem)
