@@ -12,8 +12,7 @@ from fontTools.pens.transformPen import TransformPen        # type: ignore
 from fontTools.misc.transform import DecomposedTransform    # type: ignore
 
 # Prevent seeing lots of "ns0:" everywhere when we re-serialized the XML.
-_SvgNamespace = 'http://www.w3.org/2000/svg'
-et.register_namespace('', _SvgNamespace)
+et.register_namespace('', 'http://www.w3.org/2000/svg')
 
 
 class Error(Exception):
@@ -131,8 +130,8 @@ class Panel(Element):
     def svg(self, indent:str = '    ') -> str:
         root = self.xml()
         et.indent(root, indent)
+        rootBytes = et.tostring(root, encoding='utf-8')
         # Just being picky, but I prefer generating my own <?xml ... ?> declaration,
         # just so I can use double-quotes for consistency.
         # See: https://bugs.python.org/issue36233
-        rootBytes = et.tostring(root, encoding='utf-8', method='xml', xml_declaration=False)
         return '<?xml version="1.0" encoding="utf-8"?>\n' + rootBytes.decode('utf8') + '\n'    # type: ignore
