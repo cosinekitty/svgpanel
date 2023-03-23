@@ -5,6 +5,7 @@ For more information, see:
 https://github.com/cosinekitty/svgpanel
 """
 from typing import Any, List, Tuple, Optional, Union, Callable, Dict
+from enum import Enum, unique
 import xml.etree.ElementTree as et
 from fontTools.ttLib import TTFont                          # type: ignore
 from fontTools.pens.svgPathPen import SVGPathPen            # type: ignore
@@ -19,6 +20,20 @@ class Error(Exception):
     """Indicates an error in an svgpanel function."""
     def __init__(self, message:str) -> None:
         Exception.__init__(self, message)
+
+
+@unique
+class HorizontalAlignment(Enum):
+    Left = 0
+    Center = 1
+    Right = 2
+
+
+@unique
+class VerticalAlignment(Enum):
+    Top = 0
+    Middle = 1
+    Bottom = 2
 
 
 def Move(x:float, y:float) -> str:
@@ -90,6 +105,39 @@ class TextItem:
     def measure(self) -> Tuple[float,float]:
         return self.font.measure(self.text, self.points)
 
+    def toPath(
+            self,
+            xpos: float,
+            ypos: float,
+            horizontal: HorizontalAlignment,
+            vertical: VerticalAlignment,
+            style: str = '',
+            id: str = '') -> 'TextPath':
+
+        (dx, dy) = self.measure()
+
+        if horizontal == HorizontalAlignment.Left:
+            x = xpos
+        elif horizontal == HorizontalAlignment.Right:
+            x = xpos - dx
+        elif horizontal == HorizontalAlignment.Center:
+            x = xpos - (dx/2)
+        else:
+            raise Error('Invalid horizontal alignment: {}'.format(horizontal))
+
+        if vertical == VerticalAlignment.Top:
+            y = ypos
+        elif vertical == VerticalAlignment.Bottom:
+            y = ypos - dy
+        elif vertical == VerticalAlignment.Middle:
+            y = ypos - (dy/2)
+        else:
+            raise Error('Invalid vertical alignment: {}'.format(vertical))
+
+        tp = TextPath(self, x, y, id)
+        tp.setAttrib('style', style)
+        return tp
+
 
 class Element:
     def __init__(self, tag:str, id:str = '') -> None:
@@ -135,6 +183,18 @@ class BorderRect(Element):
         self.setAttrib('style', 'display:inline;fill:{};fill-opacity:1;fill-rule:nonzero;stroke:{};stroke-width:0.7;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;image-rendering:auto'.format(fillColor, borderColor))
 
 
+class LinearGradient(Element):
+    def __init__(self, id:str, x1:float, y1:float, x2:float, y2:float, color1:str, color2:str) -> None:
+        super().__init__('linearGradient', id)
+        self.setAttribFloat('x1', x1)
+        self.setAttribFloat('y1', y1)
+        self.setAttribFloat('x2', x2)
+        self.setAttribFloat('y2', y2)
+        self.setAttrib('gradientUnits', 'userSpaceOnUse')
+        self.append(Element('stop').setAttrib('offset', '0').setAttrib('style', 'stop-color:{};stop-opacity:1;'.format(color1)))
+        self.append(Element('stop').setAttrib('offset', '1').setAttrib('style', 'stop-color:{};stop-opacity:1;'.format(color2)))
+
+
 class Panel(Element):
     def __init__(self, hpWidth:int) -> None:
         super().__init__('svg')
@@ -155,3 +215,7 @@ class Panel(Element):
         # just so I can use double-quotes for consistency.
         # See: https://bugs.python.org/issue36233
         return '<?xml version="1.0" encoding="utf-8"?>\n' + rootBytes.decode('utf8') + '\n'    # type: ignore
+
+    def save(self, outFileName:str, indent:str = '    ') -> None:
+        with open(outFileName, 'wt') as outfile:
+            outfile.write(self.svg(indent))
